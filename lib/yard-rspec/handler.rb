@@ -18,6 +18,7 @@ class RSpecContextHandler < YARD::Handlers::Ruby::Base
   handles method_call(:context)
   
   def process
+    owner[:context] = statement.parameters.first.jump(:string_content).source
     parse_block(statement.last.last, owner: owner)
   rescue YARD::Handlers::NamespaceMissingError
   end
@@ -31,8 +32,13 @@ class RSpecItHandler < YARD::Handlers::Ruby::Base
     obj = P(owner[:spec])
     return if obj.is_a?(Proxy)
     
+    name = statement.parameters.first.jump(:string_content).source
+    if owner[:context]
+      name += " (context: #{owner[:context]})"
+    end  
+    
     (obj[:specifications] ||= []) << {
-      name: statement.parameters.first.jump(:string_content).source,
+      name: name,
       file: statement.file,
       line: statement.line,
       source: statement.last.last.source.chomp
