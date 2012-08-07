@@ -12,6 +12,16 @@ class LegacyRSpecDescribeHandler < YARD::Handlers::Ruby::Legacy::Base
   end
 end
 
+class LegacyRSpecContextHandler < YARD::Handlers::Ruby::Legacy::Base
+  MATCH = /\Acontext\s+(.+?)\s+(do|\{)/
+  handles MATCH
+
+  def process
+    parse_block :owner => owner
+  rescue YARD::Handlers::NamespaceMissingError
+  end
+end
+
 class LegacyRSpecItHandler < YARD::Handlers::Ruby::Legacy::Base
   MATCH = /\Ait\s+['"](.+?)['"]\s+(do|\{)/
   handles MATCH
