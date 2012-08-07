@@ -4,6 +4,7 @@ class LegacyRSpecDescribeHandler < YARD::Handlers::Ruby::Legacy::Base
   
   def process
     objname = statement.tokens.to_s[MATCH, 1].gsub(/["']/, '')
+    objname.sub!(/^\./,'#')
     obj = {:spec => owner ? (owner[:spec] || "") : ""}
     obj[:spec] += objname
     parse_block :owner => obj
