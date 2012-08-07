@@ -17,8 +17,13 @@ class LegacyRSpecContextHandler < YARD::Handlers::Ruby::Legacy::Base
   handles MATCH
 
   def process
-    owner[:context] = statement.tokens.to_s[MATCH, 1].gsub(/["']/, '') if owner
-    parse_block :owner => owner
+    save =  owner[:context]
+    context = ''
+    context = "#{save}: " unless save.nil?
+    owner[:context] = context + statement.tokens.to_s[MATCH, 1].gsub(/["']/, '') if owner
+    r = parse_block :owner => owner
+    owner[:context] = save
+    r
   rescue YARD::Handlers::NamespaceMissingError
   end
 end
