@@ -17,6 +17,7 @@ class LegacyRSpecContextHandler < YARD::Handlers::Ruby::Legacy::Base
   handles MATCH
 
   def process
+    owner[:context] = statement.tokens.to_s[MATCH, 1].gsub(/["']/, '') if owner
     parse_block :owner => owner
   rescue YARD::Handlers::NamespaceMissingError
   end
@@ -31,8 +32,11 @@ class LegacyRSpecItHandler < YARD::Handlers::Ruby::Legacy::Base
     obj = P(owner[:spec])
     return if obj.is_a?(Proxy)
     
+    context = owner[:context]
+    context = "#{context}: " unless context.nil?
+
     (obj[:specifications] ||= []) << {
-      :name => statement.tokens.to_s[MATCH, 1],
+      :name => context.to_s+statement.tokens.to_s[MATCH, 1],
       :file => parser.file,
       :line => statement.line,
       :source => statement.block.to_s
