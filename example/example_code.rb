@@ -22,7 +22,17 @@ describe String do
       it "should fail to be a pig!" do
         "hello".pig_latin.should == "hello"
       end
-      
+
+      context " with a context" do
+        it "should fail to be a pig! in context" do
+          "hello".pig_latin.should == "hellob"
+        end
+        context " with a context in a context" do
+          it "should fail to be a pig! in context in a context " do
+            "hello".pig_latin.should == "hellob"
+          end
+        end
+      end
     end
   end
 end
