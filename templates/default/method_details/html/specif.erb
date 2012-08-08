@@ -1,0 +1,19 @@
+<li><%=@spec[:name].to_s.capitalize%>
+          <div class="source_code">
+            <table>
+              <tr>
+                <td>
+                  <pre class="lines">
+
+
+        <%=@spec[:source].split("\n").size.times.to_a.map do |i| @spec[:line] + i end.join("\n") %> </pre>
+                </td>
+                <td>
+                <pre class="code"><span class="info file"># File '<%= h @spec[:file] %>', line <%=@spec[:line] %></span>
+
+        <%= html_syntax_highlight format_source(@spec[:source]) %></pre>
+      </td>
+    </tr>
+  </table>
+</div>
+</li>

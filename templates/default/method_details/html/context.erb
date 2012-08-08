@@ -1,0 +1,19 @@
+<% @level = 0 unless @level %>
+<ul class="specs">
+  <% if @ob[:all] != [] && @ob[:all] != nil %>
+    <%= @ob[:all].map{|s| @spec = s; erb(:specif)}.join("\n") %>
+  <% end %>
+  <%@ob.each do |k,v|%>
+    <% if k!=:all %>
+      <% heading  = "h#{(@level < 3 ? @level : 2)+4}" %>
+      <li class="spec_context level_<%= @level%>"> 
+      <<%=heading%>><%=k.to_s.capitalize%>: </<%=heading%>>
+      <%@ob = v%>
+      <%@level +=1%>
+      <%= erb(:context) %>
+      <%@level -=1%>
+      </li>
+    <% end %>
+  <% end %>
+</ul>
+
