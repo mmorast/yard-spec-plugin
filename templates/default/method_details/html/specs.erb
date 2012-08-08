@@ -1,28 +1,56 @@
+<%
+
+def specif(spec)
+  r = <<EOS
+        <li>#{spec[:name].to_s.capitalize}
+          <div class="source_code">
+            <table>
+              <tr>
+                <td>
+                  <pre class="lines">
+
+
+        #{spec[:source].split("\n").size.times.to_a.map do |i| spec[:line] + i end.join("\n") } </pre>
+                </td>
+                <td>
+                  <pre class="code"><span class="info file"># File '#{ h spec[:file] }', line #{spec[:line] }</span>
+
+        #{ html_syntax_highlight format_source(spec[:source]) }</pre>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </li>
+EOS
+
+end
+
+def context(ob,level = 0)
+  r = ''
+    r += '<ul class="specs">'
+  if ob[:all] != [] && ob[:all] != nil
+    r += ob[:all].map{|s| specif(s)}.join("\n")
+  end
+  ob.each do |k,v|
+    if k!=:all
+      heading  = "h#{(level < 3 ? level : 2)+4}"
+      r += "<li class=\"spec_context level_#{level}\"> "
+      r += "<#{heading}>#{k.to_s.capitalize}: </#{heading}>\n"
+      r += context(v, level+1)
+      r += '</li>'
+    end
+  end
+    r += '</ul>'
+
+  r
+end
+
+%>
+
+
 <% if object[:specifications] %>
-<div class="tags">
+<div class="tags specifications">
   <h3>Specifications:</h3>
-  <ul class="specs">
-    <% for spec in object[:specifications] %>
-      <li><%= spec[:name] %>
-        <div class="source_code">
-          <table>
-            <tr>
-              <td>
-                <pre class="lines">
-
-
-<%= spec[:source].split("\n").size.times.to_a.map {|i| spec[:line] + i }.join("\n") %></pre>
-              </td>
-              <td>
-                <pre class="code"><span class="info file"># File '<%= h spec[:file] %>', line <%= spec[:line] %></span>
-
-<%= html_syntax_highlight format_source(spec[:source]) %></pre>
-              </td>
-            </tr>
-          </table>
-        </div>
-      </li>
-    <% end %>
-  </ul>
+  <%= context(object[:specifications]) %>
 </div>
 <% end %>

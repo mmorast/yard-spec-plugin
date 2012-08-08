@@ -1,7 +1,7 @@
 class LegacyRSpecDescribeHandler < YARD::Handlers::Ruby::Legacy::Base
   MATCH = /\Adescribe\s+(.+?)\s+(do|\{)/
   handles MATCH
-  
+
   def process
     objname = statement.tokens.to_s[MATCH, 1].gsub(/["']/, '')
     objname.sub!(/^\./,'#')
@@ -17,12 +17,12 @@ class LegacyRSpecContextHandler < YARD::Handlers::Ruby::Legacy::Base
   handles MATCH
 
   def process
-    save =  owner[:context]
-    context = ''
-    context = "#{save}: " unless save.nil?
-    owner[:context] = context + statement.tokens.to_s[MATCH, 1].gsub(/["']/, '') if owner
+    if owner
+      owner[:context] ||= []
+      owner[:context] << statement.tokens.to_s[MATCH, 1].gsub(/["']/, '')
+    end
     r = parse_block :owner => owner
-    owner[:context] = save
+    owner[:context].pop if owner
     r
   rescue YARD::Handlers::NamespaceMissingError
   end
@@ -31,21 +31,30 @@ end
 class LegacyRSpecItHandler < YARD::Handlers::Ruby::Legacy::Base
   MATCH = /\Ait\s+['"](.+?)['"]\s+(do|\{)/
   handles MATCH
-  
+
   def process
     return if owner.nil?
     obj = P(owner[:spec])
     return if obj.is_a?(Proxy)
-    
-    context = owner[:context]
-    context = "#{context}: " unless context.nil?
 
-    (obj[:specifications] ||= []) << {
-      :name => context.to_s+statement.tokens.to_s[MATCH, 1],
+    context = owner[:context]||[]
+
+    obj[:specifications] ||= {}
+    obj[:specifications][:all] ||= []
+    ob = obj[:specifications]
+    context.each do |co|
+      ob[co] ||= {}
+      ob[co][:all] ||= []
+      ob = ob[co]
+    end
+
+    ob[:all] << {
+      :name => statement.tokens.to_s[MATCH, 1],
       :file => parser.file,
       :line => statement.line,
       :source => statement.block.to_s
     }
+    obj[:specifications]
   end
 end
 
